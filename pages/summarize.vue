@@ -64,21 +64,24 @@
       <v-col cols="12" md="6">
         <v-subheader>Total Income: {{ totalIncome | currency }}</v-subheader>
       </v-col>
+
+      <v-col cols="12" md="4">
+        <v-subheader>Total Bank Transfer: {{ totalBankTransfer | currency }}</v-subheader>
+      </v-col>
       <v-col cols="12" md="6">
         <v-subheader>Total Expenses: {{ totalExpenses | currency }}</v-subheader>
       </v-col>
-      <v-col cols="12" md="6">
-        <v-subheader>Net Profit/Loss: {{ netProfit | currency }}</v-subheader>
-      </v-col>
+
 
       <!-- New Payment Method Totals -->
       <v-col cols="12" md="4">
         <v-subheader>Total Cash: {{ totalCash | currency }}</v-subheader>
       </v-col>
-      <v-col cols="12" md="4">
-        <v-subheader>Total Bank Transfer: {{ totalBankTransfer | currency }}</v-subheader>
+
+      <v-col cols="12" md="6">
+        <v-subheader>Net Profit/Loss: {{ netProfit | currency }}</v-subheader>
       </v-col>
-      <v-col cols="12" md="4" >
+      <v-col cols="12" md="4">
         <v-subheader>Total Credit Card: {{ totalCreditCard | currency }}</v-subheader>
       </v-col>
     </v-row>
@@ -119,7 +122,7 @@ export default {
     addTransaction() {
       // Check if amount is a valid number before pushing
       if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) {
-        alert('Please enter a valid amount.');
+        // alert('Please enter a valid amount.');
         return;
       }
 
