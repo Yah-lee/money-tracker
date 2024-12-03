@@ -64,15 +64,30 @@
       <v-col cols="12" md="6">
         <v-subheader>Total Income: {{ totalIncome | currency }}</v-subheader>
       </v-col>
+
+      <v-col cols="12" md="4">
+        <v-subheader>Total Bank Transfer: {{ totalBankTransfer | currency }}</v-subheader>
+      </v-col>
       <v-col cols="12" md="6">
         <v-subheader>Total Expenses: {{ totalExpenses | currency }}</v-subheader>
       </v-col>
+
+
+      <!-- New Payment Method Totals -->
+      <v-col cols="12" md="4">
+        <v-subheader>Total Cash: {{ totalCash | currency }}</v-subheader>
+      </v-col>
+
       <v-col cols="12" md="6">
         <v-subheader>Net Profit/Loss: {{ netProfit | currency }}</v-subheader>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-subheader>Total Credit Card: {{ totalCreditCard | currency }}</v-subheader>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
 
 <script>
 export default {
@@ -97,14 +112,17 @@ export default {
       ],
       totalIncome: 0,
       totalExpenses: 0,
-      netProfit: 0
+      netProfit: 0,
+      totalCash: 0,
+      totalBankTransfer: 0,
+      totalCreditCard: 0
     };
   },
   methods: {
     addTransaction() {
       // Check if amount is a valid number before pushing
       if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) {
-        alert('Please enter a valid amount.');
+        // alert('Please enter a valid amount.');
         return;
       }
 
@@ -118,9 +136,19 @@ export default {
     calculateTotals() {
       this.totalIncome = this.transactions.filter(t => t.category === 'Sales' || t.category === 'Service Income' || t.category === 'Interest')
         .reduce((sum, t) => sum + t.amount, 0);
+
       this.totalExpenses = this.transactions.filter(t => t.category === 'Housing' || t.category === 'Marketing' || t.category === 'General Expenses' || t.category === 'Wages')
         .reduce((sum, t) => sum + t.amount, 0);
+
       this.netProfit = this.totalIncome - this.totalExpenses;
+
+      // Calculate totals for each payment method
+      this.totalCash = this.transactions.filter(t => t.paymentMethod === 'Cash')
+        .reduce((sum, t) => sum + t.amount, 0);
+      this.totalBankTransfer = this.transactions.filter(t => t.paymentMethod === 'Bank Transfer')
+        .reduce((sum, t) => sum + t.amount, 0);
+      this.totalCreditCard = this.transactions.filter(t => t.paymentMethod === 'Credit Card')
+        .reduce((sum, t) => sum + t.amount, 0);
     }
   },
   filters: {
@@ -129,36 +157,4 @@ export default {
     }
   }
 };
-
-
 </script>
-
-<style scoped>
-/* Custom styles for better visual appeal */
-.v-divider {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.v-subheader {
-  font-weight: 600;
-  color: #4a4a4a;
-}
-
-.v-btn {
-  transition: transform 0.3s ease;
-}
-
-.v-btn:hover {
-  transform: scale(1.05);
-}
-
-.v-data-table th {
-  font-weight: 600;
-  background-color: #f5f5f5;
-}
-
-.v-data-table td {
-  text-align: center;
-}
-</style>
