@@ -64,97 +64,148 @@
       <v-col cols="12" md="6">
         <v-subheader>Total Income: {{ totalIncome | currency }}</v-subheader>
       </v-col>
-
       <v-col cols="12" md="4">
-        <v-subheader>Total Bank Transfer: {{ totalBankTransfer | currency }}</v-subheader>
+        <v-subheader>Total Cash: {{ totalCash | currency }}</v-subheader>
       </v-col>
       <v-col cols="12" md="6">
         <v-subheader>Total Expenses: {{ totalExpenses | currency }}</v-subheader>
       </v-col>
-
-
-      <!-- New Payment Method Totals -->
       <v-col cols="12" md="4">
-        <v-subheader>Total Cash: {{ totalCash | currency }}</v-subheader>
+        <v-subheader>Total Bank Transfer: {{ totalBankTransfer | currency }}</v-subheader>
       </v-col>
-
       <v-col cols="12" md="6">
         <v-subheader>Net Profit/Loss: {{ netProfit | currency }}</v-subheader>
       </v-col>
       <v-col cols="12" md="4">
         <v-subheader>Total Credit Card: {{ totalCreditCard | currency }}</v-subheader>
       </v-col>
+
     </v-row>
   </v-container>
 </template>
-
 
 <script>
 export default {
   data() {
     return {
       transaction: {
-        date: '',
-        description: '',
-        category: '',
-        amount: '',
-        paymentMethod: ''
+        date: "",
+        description: "",
+        category: "",
+        amount: null, // Changed to null for better validation
+        paymentMethod: "",
       },
-      categories: ['Sales', 'Service Income', 'Interest', 'Housing', 'Marketing', 'General Expenses', 'Wages'],
-      paymentMethods: ['Cash', 'Bank Transfer', 'Credit Card'],
-      transactions: [],
+      categories: [
+        "Sales",
+        "Service Income",
+        "Interest",
+        "Housing",
+        "Marketing",
+        "General Expenses",
+        "Wages",
+      ],
+      paymentMethods: ["Cash", "Bank Transfer", "Credit Card"],
+      transactions: [], // Stores all transactions
       headers: [
-        { text: 'Date', value: 'date' },
-        { text: 'Description', value: 'description' },
-        { text: 'Category', value: 'category' },
-        { text: 'Amount', value: 'amount' },
-        { text: 'Payment Method', value: 'paymentMethod' }
+        { text: "Date", value: "date" },
+        { text: "Description", value: "description" },
+        { text: "Category", value: "category" },
+        { text: "Amount", value: "amount" },
+        { text: "Payment Method", value: "paymentMethod" },
       ],
       totalIncome: 0,
       totalExpenses: 0,
       netProfit: 0,
       totalCash: 0,
       totalBankTransfer: 0,
-      totalCreditCard: 0
+      totalCreditCard: 0,
     };
   },
   methods: {
+    // Adds a transaction to the list
     addTransaction() {
-      // Check if amount is a valid number before pushing
-      if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) {
-        // alert('Please enter a valid amount.');
+      if (this.transaction.amount <= 0) {
+        alert("Amount must be greater than 0");
         return;
       }
 
-      // Add transaction to transactions array
-      this.transactions.push({ ...this.transaction, id: Date.now() });
+      // Ensure all fields are filled
+      if (
+        !this.transaction.date ||
+        !this.transaction.description ||
+        !this.transaction.category ||
+        !this.transaction.paymentMethod
+      ) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      // Add transaction to the transactions array
+      this.transactions.push({
+        ...this.transaction,
+        id: Date.now(), // Assign unique ID for tracking
+      });
+
+      // Reset form after adding
       this.resetForm();
     },
+
+    // Resets the transaction form
     resetForm() {
-      this.transaction = { date: '', description: '', category: '', amount: 0, paymentMethod: '' };
+      this.transaction = {
+        date: "",
+        description: "",
+        category: "",
+        amount: null,
+        paymentMethod: "",
+      };
     },
+
+    // Calculates totals for income, expenses, and net profit
     calculateTotals() {
-      this.totalIncome = this.transactions.filter(t => t.category === 'Sales' || t.category === 'Service Income' || t.category === 'Interest')
+      // Income categories
+      const incomeCategories = ["Sales", "Service Income", "Interest"];
+
+      // Expense categories
+      const expenseCategories = [
+        "Housing",
+        "Marketing",
+        "General Expenses",
+        "Wages",
+      ];
+
+      // Filter and calculate totals
+      this.totalIncome = this.transactions
+        .filter((t) => incomeCategories.includes(t.category))
         .reduce((sum, t) => sum + t.amount, 0);
 
-      this.totalExpenses = this.transactions.filter(t => t.category === 'Housing' || t.category === 'Marketing' || t.category === 'General Expenses' || t.category === 'Wages')
+      this.totalExpenses = this.transactions
+        .filter((t) => expenseCategories.includes(t.category))
         .reduce((sum, t) => sum + t.amount, 0);
 
+      // Net Profit
       this.netProfit = this.totalIncome - this.totalExpenses;
 
-      // Calculate totals for each payment method
-      this.totalCash = this.transactions.filter(t => t.paymentMethod === 'Cash')
+      // Totals by payment method
+      this.totalCash = this.transactions
+        .filter((t) => t.paymentMethod === "Cash")
         .reduce((sum, t) => sum + t.amount, 0);
-      this.totalBankTransfer = this.transactions.filter(t => t.paymentMethod === 'Bank Transfer')
+
+      this.totalBankTransfer = this.transactions
+        .filter((t) => t.paymentMethod === "Bank Transfer")
         .reduce((sum, t) => sum + t.amount, 0);
-      this.totalCreditCard = this.transactions.filter(t => t.paymentMethod === 'Credit Card')
+
+      this.totalCreditCard = this.transactions
+        .filter((t) => t.paymentMethod === "Credit Card")
         .reduce((sum, t) => sum + t.amount, 0);
-    }
+    },
   },
   filters: {
+    // Currency formatting filter
     currency(value) {
-      return value.toFixed(2);
-    }
-  }
+      if (!value) return "0.00";
+      return parseFloat(value).toFixed(2);
+    },
+  },
 };
 </script>
