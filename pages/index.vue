@@ -5,33 +5,73 @@
       <v-row>
         <!-- Date Field -->
         <v-col cols="12" md="6">
-          <v-text-field v-model="transaction.date" label="Date" type="date" required outlined dense />
+          <v-text-field
+            v-model="transaction.date"
+            label="Date"
+            type="date"
+            required
+            outlined
+            dense
+          />
         </v-col>
 
         <!-- Description Field -->
         <v-col cols="12" md="6">
-          <v-text-field v-model="transaction.description" label="Description" required outlined dense />
+          <v-text-field
+            v-model="transaction.description"
+            label="Description"
+            required
+            outlined
+            dense
+          />
         </v-col>
 
         <!-- Category Field -->
         <v-col cols="12" md="6">
-          <v-select v-model="transaction.category" :items="categories" label="Category" required outlined dense />
+          <v-select
+            v-model="transaction.category"
+            :items="categories"
+            label="Category"
+            required
+            outlined
+            dense
+          />
         </v-col>
 
         <!-- Amount Field -->
         <v-col cols="12" md="6">
-          <v-text-field v-model.number="transaction.amount" label="Amount" type="number" required outlined dense />
+          <v-text-field
+            v-model.number="transaction.amount"
+            label="Amount"
+            type="number"
+            required
+            outlined
+            dense
+          />
         </v-col>
 
         <!-- Payment Method Field -->
         <v-col cols="12" md="6">
-          <v-select v-model="transaction.paymentMethod" :items="paymentMethods" label="Payment Method" required outlined
-            dense />
+          <v-select
+            v-model="transaction.paymentMethod"
+            :items="paymentMethods"
+            label="Payment Method"
+            required
+            outlined
+            dense
+          />
         </v-col>
 
         <!-- Submit Button -->
         <v-col cols="12">
-          <v-btn type="submit" color="primary" class="text-transform-none" elevation="2" large block>
+          <v-btn
+            type="submit"
+            color="primary"
+            class="text-transform-none"
+            elevation="2"
+            large
+            block
+          >
             Add Transaction
           </v-btn>
         </v-col>
@@ -41,7 +81,12 @@
     <v-divider class="my-6"></v-divider>
 
     <!-- Transactions Table -->
-    <v-data-table :headers="headers" :items="transactions" item-key="id" class="elevation-1">
+    <v-data-table
+      :headers="headers"
+      :items="transactions"
+      item-key="id"
+      class="elevation-1"
+    >
       <template v-slot:item.date="{ item }">
         {{ new Date(item.date).toLocaleDateString() }}
       </template>
@@ -53,7 +98,13 @@
     <!-- Calculate Totals -->
     <v-row class="mt-6">
       <v-col cols="12">
-        <v-btn @click="calculateTotals" color="secondary" class="text-transform-none" large block>
+        <v-btn
+          @click="calculateTotals"
+          color="secondary"
+          class="text-transform-none"
+          large
+          block
+        >
           Calculate Totals
         </v-btn>
       </v-col>
@@ -66,12 +117,14 @@
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-subheader>Total Bank Transfer: {{ totalBankTransfer | currency }}</v-subheader>
+        <v-subheader>
+          Total Bank Transfer: {{ totalBankTransfer | currency }}
+        </v-subheader>
       </v-col>
+
       <v-col cols="12" md="6">
         <v-subheader>Total Expenses: {{ totalExpenses | currency }}</v-subheader>
       </v-col>
-
 
       <!-- New Payment Method Totals -->
       <v-col cols="12" md="4">
@@ -81,13 +134,15 @@
       <v-col cols="12" md="6">
         <v-subheader>Net Profit/Loss: {{ netProfit | currency }}</v-subheader>
       </v-col>
+
       <v-col cols="12" md="4">
-        <v-subheader>Total Credit Card: {{ totalCreditCard | currency }}</v-subheader>
+        <v-subheader>
+          Total Credit Card: {{ totalCreditCard | currency }}
+        </v-subheader>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
 
 <script>
 export default {
@@ -100,7 +155,15 @@ export default {
         amount: '',
         paymentMethod: ''
       },
-      categories: ['Sales', 'Service Income', 'Interest', 'Housing', 'Marketing', 'General Expenses', 'Wages'],
+      categories: [
+        'Sales',
+        'Service Income',
+        'Interest',
+        'Housing',
+        'Marketing',
+        'General Expenses',
+        'Wages'
+      ],
       paymentMethods: ['Cash', 'Bank Transfer', 'Credit Card'],
       transactions: [],
       headers: [
@@ -118,37 +181,78 @@ export default {
       totalCreditCard: 0
     };
   },
+  // 1. โหลดข้อมูลจาก localStorage ใน created() หรือจะใช้ mounted() ก็ได้
+  created() {
+    const savedTransactions = localStorage.getItem('transactions');
+    if (savedTransactions) {
+      try {
+        this.transactions = JSON.parse(savedTransactions);
+      } catch (e) {
+        console.error('Error parsing transactions from localStorage:', e);
+      }
+    }
+    // คำนวณยอดต่าง ๆ หลังจากโหลดข้อมูลแล้ว
+    this.calculateTotals();
+  },
   methods: {
     addTransaction() {
-      // Check if amount is a valid number before pushing
-      if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) {
-        // alert('Please enter a valid amount.');
-        return;
-      }
-
-      // Add transaction to transactions array
+      if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) return;
       this.transactions.push({ ...this.transaction, id: Date.now() });
       this.resetForm();
+      this.calculateTotals();
     },
     resetForm() {
-      this.transaction = { date: '', description: '', category: '', amount: 0, paymentMethod: '' };
+      this.transaction = {
+        date: '',
+        description: '',
+        category: '',
+        amount: 0,
+        paymentMethod: ''
+      };
     },
     calculateTotals() {
-      this.totalIncome = this.transactions.filter(t => t.category === 'Sales' || t.category === 'Service Income' || t.category === 'Interest')
+      this.totalIncome = this.transactions
+        .filter(
+          t =>
+            t.category === 'Sales' ||
+            t.category === 'Service Income' ||
+            t.category === 'Interest'
+        )
         .reduce((sum, t) => sum + t.amount, 0);
 
-      this.totalExpenses = this.transactions.filter(t => t.category === 'Housing' || t.category === 'Marketing' || t.category === 'General Expenses' || t.category === 'Wages')
+      this.totalExpenses = this.transactions
+        .filter(
+          t =>
+            t.category === 'Housing' ||
+            t.category === 'Marketing' ||
+            t.category === 'General Expenses' ||
+            t.category === 'Wages'
+        )
         .reduce((sum, t) => sum + t.amount, 0);
 
       this.netProfit = this.totalIncome - this.totalExpenses;
 
       // Calculate totals for each payment method
-      this.totalCash = this.transactions.filter(t => t.paymentMethod === 'Cash')
+      this.totalCash = this.transactions
+        .filter(t => t.paymentMethod === 'Cash')
         .reduce((sum, t) => sum + t.amount, 0);
-      this.totalBankTransfer = this.transactions.filter(t => t.paymentMethod === 'Bank Transfer')
+
+      this.totalBankTransfer = this.transactions
+        .filter(t => t.paymentMethod === 'Bank Transfer')
         .reduce((sum, t) => sum + t.amount, 0);
-      this.totalCreditCard = this.transactions.filter(t => t.paymentMethod === 'Credit Card')
+
+      this.totalCreditCard = this.transactions
+        .filter(t => t.paymentMethod === 'Credit Card')
         .reduce((sum, t) => sum + t.amount, 0);
+    }
+  },
+  // 2. ใช้ watch เพื่อเก็บ transactions ลง localStorage ทุกครั้งที่มีการเปลี่ยนแปลง
+  watch: {
+    transactions: {
+      deep: true, // ติดตามการเปลี่ยนแปลงในทุก ๆ element ของ Array
+      handler(newTransactions) {
+        localStorage.setItem('transactions', JSON.stringify(newTransactions));
+      }
     }
   },
   filters: {

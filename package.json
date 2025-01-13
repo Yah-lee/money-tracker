@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@nuxtjs/supabase": "^1.4.3",
-    "@supabase/supabase-js": "^2.47.0",
+    "@supabase/supabase-js": "^2.47.12",
     "core-js": "^3.25.3",
     "js-cookie": "^3.0.5",
     "nuxt": "^2.15.8",
