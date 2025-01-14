@@ -11,11 +11,14 @@
   "dependencies": {
     "@nuxtjs/supabase": "^1.4.3",
     "@supabase/supabase-js": "^2.47.12",
+    "chart.js": "^4.4.7",
     "core-js": "^3.25.3",
     "js-cookie": "^3.0.5",
     "nuxt": "^2.15.8",
     "vue": "^2.7.10",
+    "vue-chartjs": "^5.3.2",
     "vue-server-renderer": "^2.7.10",
+    "vue-swipe-actions": "^2.0.0-beta.20",
     "vue-template-compiler": "^2.7.10",
     "vuetify": "^2.6.10"
   },
