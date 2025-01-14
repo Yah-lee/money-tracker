@@ -42,7 +42,7 @@
         <v-col cols="12" md="6">
           <v-text-field
             v-model.number="transaction.amount"
-            label="Amount"
+            label="Amount (₭)"
             type="number"
             required
             outlined
@@ -88,7 +88,7 @@
       class="elevation-1"
     >
       <template v-slot:item.date="{ item }">
-        {{ new Date(item.date).toLocaleDateString() }}
+        {{ formatDate(item.date) }}
       </template>
       <template v-slot:item.amount="{ item }">
         {{ item.amount | currency }}
@@ -141,7 +141,7 @@
         <v-subheader>Total Expenses: {{ totalExpenses | currency }}</v-subheader>
       </v-col>
 
-      <!-- New Payment Method Totals -->
+      <!-- Payment Method Totals -->
       <v-col cols="12" md="4">
         <v-subheader>Total Cash: {{ totalCash | currency }}</v-subheader>
       </v-col>
@@ -190,7 +190,7 @@
             />
             <v-text-field
               v-model.number="editedTransaction.amount"
-              label="Amount"
+              label="Amount (₭)"
               type="number"
               required
               outlined
@@ -233,7 +233,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Optional: Snackbar for Feedback -->
+    <!-- Snackbar for Feedback -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.text }}
       <v-btn text @click="snackbar.show = false">Close</v-btn>
@@ -263,9 +263,9 @@ export default {
         { text: 'Date', value: 'date' },
         { text: 'Description', value: 'description' },
         { text: 'Category', value: 'category' },
-        { text: 'Amount', value: 'amount' },
+        { text: 'Amount (₭)', value: 'amount' },
         { text: 'Payment Method', value: 'paymentMethod' },
-        { text: '', value: 'actions', sortable: false }
+        { text: 'Actions', value: 'actions', sortable: false }
       ],
       totalIncome: 0,
       totalExpenses: 0,
@@ -301,7 +301,14 @@ export default {
   },
   methods: {
     addTransaction() {
-      if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) return;
+      if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) {
+        this.showSnackbar('Please enter a valid amount.', 'error');
+        return;
+      }
+      if (!this.transaction.date || !this.transaction.description || !this.transaction.category || !this.transaction.paymentMethod) {
+        this.showSnackbar('Please fill in all required fields.', 'error');
+        return;
+      }
       this.transactions.push({ ...this.transaction, id: Date.now() });
       this.resetForm();
       this.calculateTotals();
@@ -317,18 +324,17 @@ export default {
       };
     },
     calculateTotals() {
+      // Total Income: Sales
       this.totalIncome = this.transactions
         .filter(t => t.category === 'Sales')
         .reduce((sum, t) => sum + t.amount, 0);
 
+      // Total Expenses: Wages + General Expenses
       this.totalExpenses = this.transactions
-        .filter(
-          t =>
-            t.category === 'Wages' ||
-            t.category === 'General Expenses'
-        )
+        .filter(t => t.category === 'Wages' || t.category === 'General Expenses')
         .reduce((sum, t) => sum + t.amount, 0);
 
+      // Net Profit/Loss
       this.netProfit = this.totalIncome - this.totalExpenses;
 
       // Calculate totals for each payment method
@@ -350,7 +356,14 @@ export default {
       this.dialog = true;
     },
     updateTransaction() {
-      if (!this.editedTransaction) return;
+      if (!this.editedTransaction.amount || isNaN(this.editedTransaction.amount) || this.editedTransaction.amount <= 0) {
+        this.showSnackbar('Please enter a valid amount.', 'error');
+        return;
+      }
+      if (!this.editedTransaction.date || !this.editedTransaction.description || !this.editedTransaction.category || !this.editedTransaction.paymentMethod) {
+        this.showSnackbar('Please fill in all required fields.', 'error');
+        return;
+      }
 
       const index = this.transactions.findIndex(
         t => t.id === this.editedTransaction.id
@@ -368,7 +381,7 @@ export default {
       this.originalTransaction = {};
     },
 
-    // Updated deleteTransaction method
+    // Delete Transaction
     deleteTransaction(id) {
       const transaction = this.transactions.find(t => t.id === id);
       if (transaction) {
@@ -398,6 +411,11 @@ export default {
       this.snackbar.text = message;
       this.snackbar.color = color;
       this.snackbar.show = true;
+    },
+
+    // Format Date
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('en-US');
     }
   },
   watch: {
@@ -413,7 +431,13 @@ export default {
       if (typeof value !== "number") {
         return value;
       }
-      return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      // ตรวจสอบการรองรับ locale และ currency
+      try {
+        return value.toLocaleString('lo-LA', { style: 'currency', currency: 'LAK' });
+      } catch (e) {
+        // หากไม่รองรับ ให้ใช้สัญลักษณ์กีบลาวด้วยตนเอง
+        return '₭' + value.toLocaleString('en-US', { minimumFractionDigits: 0 });
+      }
     }
   }
 };
