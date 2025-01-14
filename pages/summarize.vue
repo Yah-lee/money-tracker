@@ -5,61 +5,28 @@
       <v-row>
         <!-- Date Field -->
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model="transaction.date"
-            label="ວັນທີ່/ເດືອນ/ປີ"
-            type="date"
-            required
-            outlined
-            dense
-          />
+          <v-text-field v-model="transaction.date" label="ວັນທີ່/ເດືອນ/ປີ" type="date" required outlined dense />
         </v-col>
 
         <!-- Description Field -->
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model="transaction.description"
-            label="ລາຍລະອຽດ"
-            required
-            outlined
-            dense
-          />
+          <v-text-field v-model="transaction.description" label="ລາຍລະອຽດ" required outlined dense />
         </v-col>
 
         <!-- Category Field -->
         <v-col cols="12" md="6">
-          <v-select
-            v-model="transaction.category"
-            :items="categories"
-            label="ປະເພດ"
-            required
-            outlined
-            dense
-          />
+          <v-select v-model="transaction.category" :items="categories" label="ປະເພດ" required outlined dense />
         </v-col>
 
         <!-- Amount Field -->
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model.number="transaction.amount"
-            label="ຈຳນວນ (₭)"
-            type="number"
-            required
-            outlined
-            dense
-          />
+          <v-text-field v-model.number="transaction.amount" label="ຈຳນວນ (₭)" type="number" required outlined dense />
         </v-col>
 
         <!-- Payment Method Field -->
         <v-col cols="12" md="6">
-          <v-select
-            v-model="transaction.paymentMethod"
-            :items="paymentMethods"
-            label="ວິທີການຊຳລະເງີນ"
-            required
-            outlined
-            dense
-          />
+          <v-select v-model="transaction.paymentMethod" :items="paymentMethods" label="ວິທີການຊຳລະເງີນ" required
+            outlined dense />
         </v-col>
 
         <!-- Submit Button -->
@@ -86,9 +53,7 @@
           <v-btn small color="blue" @click="editTransaction(item)" class="mr-2">
             ແກ້ໄຂ
           </v-btn>
-          <v-btn small color="red" @click="deleteTransaction(item.id)">
-            ລຶບ
-          </v-btn>
+          <v-btn small color="red" @click="deleteTransaction(item.id)"> ລຶບ </v-btn>
         </div>
       </template>
     </v-data-table>
@@ -100,9 +65,7 @@
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-subheader>
-          ເງີນໂອນທັງໝົດ : {{ totalBankTransfer | currency }}
-        </v-subheader>
+        <v-subheader> ເງີນໂອນທັງໝົດ : {{ totalBankTransfer | currency }} </v-subheader>
       </v-col>
 
       <v-col cols="12" md="6">
@@ -119,9 +82,7 @@
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-subheader>
-          Credit Card: {{ totalCreditCard | currency }}
-        </v-subheader>
+        <v-subheader> Credit Card: {{ totalCreditCard | currency }} </v-subheader>
       </v-col>
     </v-row>
 
@@ -135,8 +96,7 @@
           <v-form ref="form" @submit.prevent="updateTransaction">
             <v-text-field v-model="editedTransaction.date" label="ວັນທີ/ເດືອນ/ປີ" type="date" required outlined dense />
             <v-text-field v-model="editedTransaction.description" label="ລາຍລະອຽດ" required outlined dense />
-            <v-select v-model="editedTransaction.category" :items="categories" label="ປະເພດ" required outlined
-              dense />
+            <v-select v-model="editedTransaction.category" :items="categories" label="ປະເພດ" required outlined dense />
             <v-text-field v-model.number="editedTransaction.amount" label="ຈຳນວນ (₭)" type="number" required outlined
               dense />
             <v-select v-model="editedTransaction.paymentMethod" :items="paymentMethods" label="ວິທີການຊຳລະເງີນ" required
@@ -145,12 +105,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeDialog">
-            ຍົກເລີກ
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="updateTransaction">
-            ບັນທືກ
-          </v-btn>
+          <v-btn color="blue darken-1" text @click="closeDialog"> ຍົກເລີກ </v-btn>
+          <v-btn color="blue darken-1" text @click="updateTransaction"> ບັນທືກ </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -159,9 +115,7 @@
     <v-dialog v-model="deleteDialog" max-width="400px">
       <v-card>
         <v-card-title class="headline">ຢືນຢັນການລຶບ</v-card-title>
-        <v-card-text>
-          ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບທຸລະກຳນີ້ ?
-        </v-card-text>
+        <v-card-text> ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບທຸລະກຳນີ້ ? </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey" text @click="closeDeleteDialog">ຍົກເລີກ</v-btn>
@@ -184,25 +138,21 @@ export default {
     return {
       transaction: {
         date: this.getCurrentDate(), // Initialize with current date
-        description: '',
-        category: '',
+        description: "",
+        category: "",
         amount: 0,
-        paymentMethod: ''
+        paymentMethod: "",
       },
-      categories: [
-        'ການຂາຍ',
-        'ເງີນເດືອນ',
-        'ຄ່າໃຊ້ຈ່າຍທົ່ວໄປ'
-      ],
-      paymentMethods: ['ເງີນສົດ', 'ເງີນໂອນ', 'Credit Card'],
+      categories: ["ການຂາຍ", "ເງີນເດືອນ", "ຄ່າໃຊ້ຈ່າຍທົ່ວໄປ"],
+      paymentMethods: ["ເງີນສົດ", "ເງີນໂອນ", "Credit Card"],
       transactions: [],
       headers: [
-        { text: 'ວັນທີ/ເດືອນ/ປີ', value: 'date' },
-        { text: 'ລາຍລະອຽດ', value: 'description' },
-        { text: 'ປະເພດ', value: 'category' },
-        { text: 'ຈໍານວນ (₭)', value: 'amount' },
-        { text: 'ວິທີການຊໍາລະເງິນ', value: 'paymentMethod' },
-        { text: '', value: 'actions', sortable: false }
+        { text: "ວັນທີ/ເດືອນ/ປີ", value: "date" },
+        { text: "ລາຍລະອຽດ", value: "description" },
+        { text: "ປະເພດ", value: "category" },
+        { text: "ຈໍານວນ (₭)", value: "amount" },
+        { text: "ວິທີການຊໍາລະເງິນ", value: "paymentMethod" },
+        { text: "", value: "actions", sortable: false },
       ],
       totalIncome: 0,
       totalExpenses: 0,
@@ -220,20 +170,20 @@ export default {
       // For snackbar
       snackbar: {
         show: false,
-        text: '',
-        color: ''
+        text: "",
+        color: "",
       },
       // Optional: Current DateTime Display
-      currentDateTime: ''
+      currentDateTime: "",
     };
   },
   created() {
-    const savedTransactions = localStorage.getItem('transactions');
+    const savedTransactions = localStorage.getItem("transactions");
     if (savedTransactions) {
       try {
         this.transactions = JSON.parse(savedTransactions);
       } catch (e) {
-        console.error('Error parsing transactions from localStorage:', e);
+        console.error("Error parsing transactions from localStorage:", e);
       }
     }
     this.calculateTotals();
@@ -250,8 +200,8 @@ export default {
     getCurrentDate() {
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
     },
     getFormattedCurrentDateTime() {
@@ -271,36 +221,40 @@ export default {
       }
 
       if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) {
-        this.showSnackbar('ກະລຸນາໃສ່ຈໍານວນທີ່ຖືກຕ້ອງ .', 'error');
+        this.showSnackbar("ກະລຸນາໃສ່ຈໍານວນທີ່ຖືກຕ້ອງ .", "error");
         return;
       }
-      if (!this.transaction.description || !this.transaction.category || !this.transaction.paymentMethod) {
-        this.showSnackbar('Please fill in all required fields.', 'error');
+      if (
+        !this.transaction.description ||
+        !this.transaction.category ||
+        !this.transaction.paymentMethod
+      ) {
+        this.showSnackbar("Please fill in all required fields.", "error");
         return;
       }
       this.transactions.push({ ...this.transaction, id: Date.now() });
       this.resetForm();
       this.calculateTotals();
-      this.showSnackbar('ເພີ່ມທຸລະກຳສຳເລັດແລ້ວ.', 'success');
+      this.showSnackbar("ເພີ່ມທຸລະກຳສຳເລັດແລ້ວ.", "success");
     },
     resetForm() {
       this.transaction = {
         date: this.getCurrentDate(), // Reset to current date
-        description: '',
-        category: '',
+        description: "",
+        category: "",
         amount: 0,
-        paymentMethod: ''
+        paymentMethod: "",
       };
     },
     calculateTotals() {
       // Total Income: Sales
       this.totalIncome = this.transactions
-        .filter(t => t.category === 'ການຂາຍ') // Ensure category matches your categories
+        .filter((t) => t.category === "ການຂາຍ") // Ensure category matches your categories
         .reduce((sum, t) => sum + t.amount, 0);
 
       // Total Expenses: Wages + General Expenses
       this.totalExpenses = this.transactions
-        .filter(t => t.category === 'ເງີນເດືອນ' || t.category === 'ຄ່າໃຊ້ຈ່າຍທົ່ວໄປ')
+        .filter((t) => t.category === "ເງີນເດືອນ" || t.category === "ຄ່າໃຊ້ຈ່າຍທົ່ວໄປ")
         .reduce((sum, t) => sum + t.amount, 0);
 
       // Net Profit/Loss
@@ -308,15 +262,15 @@ export default {
 
       // Calculate totals for each payment method
       this.totalCash = this.transactions
-        .filter(t => t.paymentMethod === 'ເງີນສົດ')
+        .filter((t) => t.paymentMethod === "ເງີນສົດ")
         .reduce((sum, t) => sum + t.amount, 0);
 
       this.totalBankTransfer = this.transactions
-        .filter(t => t.paymentMethod === 'ເງີນໂອນ')
+        .filter((t) => t.paymentMethod === "ເງີນໂອນ")
         .reduce((sum, t) => sum + t.amount, 0);
 
       this.totalCreditCard = this.transactions
-        .filter(t => t.paymentMethod === 'Credit Card')
+        .filter((t) => t.paymentMethod === "Credit Card")
         .reduce((sum, t) => sum + t.amount, 0);
     },
     editTransaction(item) {
@@ -325,23 +279,32 @@ export default {
       this.dialog = true;
     },
     updateTransaction() {
-      if (!this.editedTransaction.amount || isNaN(this.editedTransaction.amount) || this.editedTransaction.amount <= 0) {
-        this.showSnackbar('Please enter a valid amount.', 'error');
+      if (
+        !this.editedTransaction.amount ||
+        isNaN(this.editedTransaction.amount) ||
+        this.editedTransaction.amount <= 0
+      ) {
+        this.showSnackbar("Please enter a valid amount.", "error");
         return;
       }
-      if (!this.editedTransaction.date || !this.editedTransaction.description || !this.editedTransaction.category || !this.editedTransaction.paymentMethod) {
-        this.showSnackbar('Please fill in all required fields.', 'error');
+      if (
+        !this.editedTransaction.date ||
+        !this.editedTransaction.description ||
+        !this.editedTransaction.category ||
+        !this.editedTransaction.paymentMethod
+      ) {
+        this.showSnackbar("Please fill in all required fields.", "error");
         return;
       }
 
       const index = this.transactions.findIndex(
-        t => t.id === this.editedTransaction.id
+        (t) => t.id === this.editedTransaction.id
       );
       if (index !== -1) {
         this.$set(this.transactions, index, { ...this.editedTransaction });
         this.calculateTotals();
         this.closeDialog();
-        this.showSnackbar('ອັບເດດທຸລະກຳສຳເລັດແລ້ວ .', 'success');
+        this.showSnackbar("ອັບເດດທຸລະກຳສຳເລັດແລ້ວ .", "success");
       }
     },
     closeDialog() {
@@ -352,7 +315,7 @@ export default {
 
     // Delete Transaction
     deleteTransaction(id) {
-      const transaction = this.transactions.find(t => t.id === id);
+      const transaction = this.transactions.find((t) => t.id === id);
       if (transaction) {
         this.transactionToDelete = transaction;
         this.deleteDialog = true;
@@ -360,11 +323,13 @@ export default {
     },
     confirmDelete() {
       if (this.transactionToDelete) {
-        const index = this.transactions.findIndex(t => t.id === this.transactionToDelete.id);
+        const index = this.transactions.findIndex(
+          (t) => t.id === this.transactionToDelete.id
+        );
         if (index !== -1) {
           this.transactions.splice(index, 1);
           this.calculateTotals();
-          this.showSnackbar('ລຶບທຸລະກຳສຳເລັດແລ້ວ .', 'success');
+          this.showSnackbar("ລຶບທຸລະກຳສຳເລັດແລ້ວ .", "success");
         }
         this.transactionToDelete = null;
         this.deleteDialog = false;
@@ -384,31 +349,29 @@ export default {
 
     // Format Date
     formatDate(date) {
-      return new Date(date).toLocaleDateString('en-US');
-    }
+      return new Date(date).toLocaleDateString("en-US");
+    },
   },
   watch: {
     transactions: {
       deep: true,
       handler(newTransactions) {
-        localStorage.setItem('transactions', JSON.stringify(newTransactions));
-      }
-    }
+        localStorage.setItem("transactions", JSON.stringify(newTransactions));
+      },
+    },
   },
   filters: {
     currency(value) {
       if (typeof value !== "number") {
         return value;
       }
-      // ตรวจสอบการรองรับ locale และ currency
       try {
-        return value.toLocaleString('lo-LA', { style: 'currency', currency: 'LAK' });
+        return value.toLocaleString("lo-LA", { style: "currency", currency: "LAK" });
       } catch (e) {
-        // หากไม่รองรับ ให้ใช้สัญลักษณ์กีบลาวด้วยตนเอง
-        return '₭' + value.toLocaleString('en-US', { minimumFractionDigits: 0 });
+        return "₭" + value.toLocaleString("en-US", { minimumFractionDigits: 0 });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
