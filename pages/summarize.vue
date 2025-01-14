@@ -1,6 +1,6 @@
-<template>
+ฃ<template>
   <v-container class="pa-5">
-    <!-- Transaction Form (Add New) -->
+    <!-- Transaction Form -->
     <v-form @submit.prevent="addTransaction" class="mb-6">
       <v-row>
         <!-- Date Field -->
@@ -87,32 +87,11 @@
       item-key="id"
       class="elevation-1"
     >
-      <!-- แก้ไขจุดนี้: ตรวจสอบว่ามี date หรือไม่ก่อน new Date(...) -->
       <template v-slot:item.date="{ item }">
-        <span v-if="item.date">
-          {{ new Date(item.date).toLocaleDateString() }}
-        </span>
-        <span v-else>
-          -
-        </span>
+        {{ new Date(item.date).toLocaleDateString() }}
       </template>
-
       <template v-slot:item.amount="{ item }">
         {{ item.amount | currency }}
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-btn
-          icon
-          small
-          color="primary"
-          @click="openEditDialog(item)"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn icon small color="error" @click="deleteTransaction(item)">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
       </template>
     </v-data-table>
 
@@ -162,83 +141,6 @@
         </v-subheader>
       </v-col>
     </v-row>
-
-    <!-- Dialog สำหรับแก้ไขรายการ -->
-    <v-dialog
-      v-model="editDialog"
-      max-width="600px"
-      persistent
-    >
-      <v-card>
-        <v-card-title>
-          <span class="headline">Edit Transaction</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model="editedTransaction.date"
-                  label="Date"
-                  type="date"
-                  required
-                  outlined
-                  dense
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model="editedTransaction.description"
-                  label="Description"
-                  required
-                  outlined
-                  dense
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select
-                  v-model="editedTransaction.category"
-                  :items="categories"
-                  label="Category"
-                  required
-                  outlined
-                  dense
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model.number="editedTransaction.amount"
-                  label="Amount"
-                  type="number"
-                  required
-                  outlined
-                  dense
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select
-                  v-model="editedTransaction.paymentMethod"
-                  :items="paymentMethods"
-                  label="Payment Method"
-                  required
-                  outlined
-                  dense
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text color="error" @click="cancelEdit">Cancel</v-btn>
-          <v-btn text color="primary" @click="updateTransaction">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -247,95 +149,84 @@ export default {
   data() {
     return {
       transaction: {
-        date: "",
-        description: "",
-        category: "",
-        amount: 0,
-        paymentMethod: "",
+        date: '',
+        description: '',
+        category: '',
+        amount: '',
+        paymentMethod: ''
       },
       categories: [
-        "Sales",
-        "Service Income",
-        "Interest",
-        "Housing",
-        "Marketing",
-        "General Expenses",
-        "Wages",
+        'Sales',
+        'Service Income',
+        'Interest',
+        'Housing',
+        'Marketing',
+        'General Expenses',
+        'Wages'
       ],
-      paymentMethods: ["Cash", "Bank Transfer", "Credit Card"],
+      paymentMethods: ['Cash', 'Bank Transfer', 'Credit Card'],
       transactions: [],
-      // ส่วนของการแก้ไข
-      editDialog: false,
-      editedTransaction: null,
-      editedIndex: -1,
-
       headers: [
-        { text: "Date", value: "date" },
-        { text: "Description", value: "description" },
-        { text: "Category", value: "category" },
-        { text: "Amount", value: "amount" },
-        { text: "Payment Method", value: "paymentMethod" },
-        // เพิ่มคอลัมน์ Actions
-        { text: "Actions", value: "actions", sortable: false },
+        { text: 'Date', value: 'date' },
+        { text: 'Description', value: 'description' },
+        { text: 'Category', value: 'category' },
+        { text: 'Amount', value: 'amount' },
+        { text: 'Payment Method', value: 'paymentMethod' }
       ],
       totalIncome: 0,
       totalExpenses: 0,
       netProfit: 0,
       totalCash: 0,
       totalBankTransfer: 0,
-      totalCreditCard: 0,
+      totalCreditCard: 0
     };
   },
+  // 1. โหลดข้อมูลจาก localStorage ใน created() หรือจะใช้ mounted() ก็ได้
   created() {
-    const savedTransactions = localStorage.getItem("transactions");
+    const savedTransactions = localStorage.getItem('transactions');
     if (savedTransactions) {
       try {
         this.transactions = JSON.parse(savedTransactions);
       } catch (e) {
-        console.error("Error parsing transactions from localStorage:", e);
+        console.error('Error parsing transactions from localStorage:', e);
       }
     }
-    // คำนวณยอดหลังโหลดข้อมูล
+    // คำนวณยอดต่าง ๆ หลังจากโหลดข้อมูลแล้ว
     this.calculateTotals();
   },
   methods: {
-    // เพิ่มรายการใหม่
     addTransaction() {
-      // ป้องกันกรอก amount ผิด
       if (isNaN(this.transaction.amount) || this.transaction.amount <= 0) return;
-      // สร้างรายการพร้อม id (เวลาปัจจุบัน)
       this.transactions.push({ ...this.transaction, id: Date.now() });
       this.resetForm();
       this.calculateTotals();
     },
-    // รีเซตฟอร์ม
     resetForm() {
       this.transaction = {
-        date: "",
-        description: "",
-        category: "",
+        date: '',
+        description: '',
+        category: '',
         amount: 0,
-        paymentMethod: "",
+        paymentMethod: ''
       };
     },
-    // คำนวณยอด
     calculateTotals() {
       this.totalIncome = this.transactions
         .filter(
-          (t) =>
-            t.category === "Sales" ||
-            t.category === "Service Income" ||
-            t.category === "Interest"
+          t =>
+            t.category === 'Sales' ||
+            t.category === 'Service Income' ||
+            t.category === 'Interest'
         )
         .reduce((sum, t) => sum + t.amount, 0);
 
       this.totalExpenses = this.transactions
         .filter(
-          (t) =>
-            t.category === "Housing" ||
-            t.category === "Marketing" ||
-            t.category === "General Expenses" ||
-            t.category === "Wages"
+          t =>
+            t.category === 'Housing' ||
+            t.category === 'Marketing' ||
+            t.category === 'General Expenses' ||
+            t.category === 'Wages'
         )
         .reduce((sum, t) => sum + t.amount, 0);
 
@@ -343,70 +234,31 @@ export default {
 
       // Calculate totals for each payment method
       this.totalCash = this.transactions
-        .filter((t) => t.paymentMethod === "Cash")
+        .filter(t => t.paymentMethod === 'Cash')
         .reduce((sum, t) => sum + t.amount, 0);
 
       this.totalBankTransfer = this.transactions
-        .filter((t) => t.paymentMethod === "Bank Transfer")
+        .filter(t => t.paymentMethod === 'Bank Transfer')
         .reduce((sum, t) => sum + t.amount, 0);
 
       this.totalCreditCard = this.transactions
-        .filter((t) => t.paymentMethod === "Credit Card")
+        .filter(t => t.paymentMethod === 'Credit Card')
         .reduce((sum, t) => sum + t.amount, 0);
-    },
-
-    // ฟังก์ชันเปิด Dialog แก้ไข
-    openEditDialog(item) {
-      // หา index ของ item ที่ต้องการแก้ไข
-      this.editedIndex = this.transactions.findIndex((t) => t.id === item.id);
-      // ทำสำเนาของ item ไปยัง editedTransaction เพื่อแก้ไข
-      this.editedTransaction = { ...item };
-      this.editDialog = true;
-    },
-
-    // บันทึกการแก้ไข
-    updateTransaction() {
-      if (this.editedIndex > -1) {
-        // ใช้ splice เพื่อแทนที่ค่าเก่า
-        this.transactions.splice(this.editedIndex, 1, {
-          ...this.editedTransaction,
-        });
-        this.calculateTotals();
-      }
-      this.editDialog = false;
-      this.editedTransaction = null;
-      this.editedIndex = -1;
-    },
-
-    // ยกเลิกแก้ไข
-    cancelEdit() {
-      this.editDialog = false;
-      this.editedTransaction = null;
-      this.editedIndex = -1;
-    },
-
-    // ลบรายการ
-    deleteTransaction(item) {
-      const index = this.transactions.findIndex((t) => t.id === item.id);
-      if (index > -1) {
-        this.transactions.splice(index, 1);
-      }
-      this.calculateTotals();
-    },
+    }
   },
+  // 2. ใช้ watch เพื่อเก็บ transactions ลง localStorage ทุกครั้งที่มีการเปลี่ยนแปลง
   watch: {
-    // Watch เพื่อเก็บข้อมูลลง localStorage ทุกครั้งที่ transactions เปลี่ยน
     transactions: {
-      deep: true,
+      deep: true, // ติดตามการเปลี่ยนแปลงในทุก ๆ element ของ Array
       handler(newTransactions) {
-        localStorage.setItem("transactions", JSON.stringify(newTransactions));
-      },
-    },
+        localStorage.setItem('transactions', JSON.stringify(newTransactions));
+      }
+    }
   },
   filters: {
     currency(value) {
-      return Number(value).toFixed(2);
-    },
-  },
+      return value.toFixed(2);
+    }
+  }
 };
 </script>
