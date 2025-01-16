@@ -147,7 +147,7 @@ export default {
       paymentMethods: ["ເງີນສົດ", "ເງີນໂອນ", "Credit Card"],
       transactions: [],
       headers: [
-        { text: "ວັນທີ/ເດືອນ/ປີ", value: "date" },
+        { text: "ເດືອນ/ວັນທີ/ປີ", value: "date" },
         { text: "ລາຍລະອຽດ", value: "description" },
         { text: "ປະເພດ", value: "category" },
         { text: "ຈໍານວນ (₭)", value: "amount" },
